@@ -1,3 +1,5 @@
+import 'regenerator-runtime/runtime'
+
 import "./styles.css";
 import Trie from "./Trie";
 import words from "./words";
