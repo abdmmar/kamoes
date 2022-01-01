@@ -174,8 +174,7 @@ const WORD_API_URL = 'https://kbbi-api-amm.herokuapp.com/search?q=';
         main.append(card);
       });
     } catch (error) {
-      main.innerHTML = '<p style="color: red">Kata not found!</p>';
-      console.error(error);
+      main.innerHTML = `<p style="color: #4169e1; text-align: center">${error.message}</p>`;
     }
   });
 
@@ -188,6 +187,11 @@ const WORD_API_URL = 'https://kbbi-api-amm.herokuapp.com/search?q=';
 async function getKata(word) {
   const response = await fetch(`${WORD_API_URL}${word}`);
   const result = await response.json();
+
+  if (result.data.resultLists[0].arti.length === 0) {
+    throw new Error('Kata tidak ditemukan! Coba cari kata yang lain.');
+  }
+
   return result;
 }
 
