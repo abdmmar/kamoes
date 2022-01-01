@@ -3,18 +3,22 @@
 *::after {
   box-sizing: border-box;
 }
+
 * {
   margin: 0;
 }
+
 html,
 body {
   height: 100%;
 }
+
 body {
   line-height: 1.5;
   font-family: sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
 img,
 picture,
 video,
@@ -23,12 +27,14 @@ svg {
   display: block;
   max-width: 100%;
 }
+
 input,
 button,
 textarea,
 select {
   font: inherit;
 }
+
 p,
 h1,
 h2,
@@ -49,8 +55,13 @@ h6 {
 }
 
 #app {
-  display: grid;
-  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-block: 50px;
+  padding-inline: 10px;
+  width: -webkit-fill-available;
 }
 
 .kbbi-header {
@@ -62,6 +73,17 @@ h6 {
   position: relative;
   width: fit-content;
   min-width: 400px;
+}
+
+@media screen and (max-width: 400px) {
+  #app {
+    margin-block: 20px;
+  }
+
+  .search-autocomplete {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .autocomplete {
@@ -238,6 +260,7 @@ main {
     transform: scale(1);
   }
 }
+
 @keyframes swap {
   0%,
   100% {
