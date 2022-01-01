@@ -8,8 +8,7 @@ class Trie {
   constructor() {
     this.root = new TrieNode();
   }
-
-  // O(K+1), K = Length of word
+  // O(K+1)
   insert(word) {
     let currentNode = this.root;
     let chars = word.split('');
@@ -28,7 +27,6 @@ class Trie {
 
     currentNode.children.set('*', null);
   }
-
   // O(K)
   search(word) {
     let currentNode = this.root;
@@ -46,7 +44,6 @@ class Trie {
 
     return currentNode;
   }
-
   collectAllWords(node, word = '', words = []) {
     let currentNode = node || this.root;
 
@@ -61,7 +58,6 @@ class Trie {
 
     return words;
   }
-
   autocomplete(prefix) {
     let currentNode = this.search(prefix);
 

@@ -4,12 +4,13 @@ Autocomplete feature to search a word in KBBI using Trie
 
 ## Development
 
-```
-yarn run start
-```
+open `index.html`
 
-## Build
+## Credits
 
-```
-yarn run build
-```
+- [kbbi.vercel.app](https://kbbi.vercel.app/) by [mathdroid](github.com/mathdroid)
+- [kbbi-api](https://github.com/azharimm/kbbi-api) by [azharim](https://github.com/azharimm/)
+
+## License
+
+[MIT](LICENSE)

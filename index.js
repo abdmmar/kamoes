@@ -1,34 +1,44 @@
-import 'regenerator-runtime/runtime'
+import Trie from './Trie.js';
 
-import "./styles.css";
-import Trie from "./Trie";
-import words from "./words";
+/**
+ * KBBI V5
+ * Author: Muhammad Mustadi (@mathdroid)
+ * License: MIT
+ * Source: https://kbbi.vercel.app/
+ */
+import kamus from './kamus.js';
 
-const WORD_API_URL = "https://kbbi-api-amm.herokuapp.com/search?q=";
+/**
+ * KBBI API
+ * Author: Azhari Muhammad M <azhari.marzan@gmail.com>
+ * License: -
+ * Source: https://github.com/azharimm/kbbi-api
+ */
+const WORD_API_URL = 'https://kbbi-api-amm.herokuapp.com/search?q=';
 
 (function main() {
   let currentFocus = -1;
-  const resetButton = document.querySelector(".reset-button");
-  const inputSearch = document.getElementById("search-input");
-  const autocompleteForm = document.querySelector(".autocomplete");
+  const resetButton = document.querySelector('.reset-button');
+  const inputSearch = document.getElementById('search-input');
+  const autocompleteForm = document.querySelector('.autocomplete');
 
   let trie = new Trie();
 
   // Insert each word to trie
-  for (let word of words) {
-    trie.insert(word.keyword.toLowerCase());
+  for (let kata of kamus) {
+    trie.insert(kata.toLowerCase());
   }
 
   // Main feature
-  inputSearch.addEventListener("input", (e) => {
-    const resultList = document.querySelector(".result-list");
+  inputSearch.addEventListener('input', (e) => {
+    const resultList = document.querySelector('.result-list');
 
     showResetButton();
 
     const searchValue = e.target.value.trim().toLowerCase();
 
     // Close autocomplete and hide reset button if search value is empty
-    if (searchValue === "") {
+    if (searchValue === '') {
       hideResetButton();
       closeAutocomplete();
       return;
@@ -57,10 +67,10 @@ const WORD_API_URL = "https://kbbi-api-amm.herokuapp.com/search?q=";
     // Add new result to the list
     for (let word of data) {
       // Create a new <li> element for each result
-      const item = document.createElement("li");
-      item.setAttribute("class", "result-item");
+      const item = document.createElement('li');
+      item.setAttribute('class', 'result-item');
       item.innerHTML = `<strong>${searchValue}</strong>${word}`;
-      item.addEventListener("click", (e) => {
+      item.addEventListener('click', (e) => {
         inputSearch.value = item.textContent;
         closeAutocomplete();
         currentFocus = -1;
@@ -72,28 +82,28 @@ const WORD_API_URL = "https://kbbi-api-amm.herokuapp.com/search?q=";
   });
 
   // When press arrow , focus on the autocomplete result
-  inputSearch.addEventListener("keydown", (e) => {
-    const resultList = document.querySelector(".result-list");
-    const resultItem = resultList.querySelectorAll(".result-item");
+  inputSearch.addEventListener('keydown', (e) => {
+    const resultList = document.querySelector('.result-list');
+    const resultItem = resultList.querySelectorAll('.result-item');
     const key = e.key;
 
-    if (key === "Tab") {
+    if (key === 'Tab') {
       closeAutocomplete();
       return;
     }
 
-    if (key === "ArrowDown") {
+    if (key === 'ArrowDown') {
       currentFocus++;
 
       if (currentFocus >= resultItem.length) currentFocus = 0;
 
       removeAllActiveElement(resultItem);
       addActiveElement(resultItem, currentFocus);
-    } else if (key === "ArrowUp") {
+    } else if (key === 'ArrowUp') {
       currentFocus--;
       removeAllActiveElement(resultItem);
       addActiveElement(resultItem, currentFocus);
-    } else if (key === "Enter") {
+    } else if (key === 'Enter') {
       e.preventDefault();
 
       if (currentFocus > -1) {
@@ -103,19 +113,19 @@ const WORD_API_URL = "https://kbbi-api-amm.herokuapp.com/search?q=";
   });
 
   // Override default behavior of clicking reset button
-  resetButton.addEventListener("click", () => {
-    inputSearch.value = "";
+  resetButton.addEventListener('click', () => {
+    inputSearch.value = '';
     closeAutocomplete();
     inputSearch.focus();
-    resetButton.style.display = "none";
+    resetButton.style.display = 'none';
   });
 
   // Get lema and meaning
-  autocompleteForm.addEventListener("submit", async (e) => {
+  autocompleteForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(autocompleteForm);
-    const input = formData.get("search-input").toLowerCase();
-    const main = document.querySelector("main");
+    const input = formData.get('search-input').toLowerCase();
+    const main = document.querySelector('main');
 
     main.innerHTML = '<div class="loading-container loading"></div>';
 
@@ -124,27 +134,27 @@ const WORD_API_URL = "https://kbbi-api-amm.herokuapp.com/search?q=";
       const data = result.data.resultLists;
 
       // Create card element
-      const card = document.createElement("div");
-      const title = document.createElement("h2");
-      card.setAttribute("class", "card");
-      title.setAttribute("class", "card-title");
+      const card = document.createElement('div');
+      const title = document.createElement('h2');
+      card.setAttribute('class', 'card');
+      title.setAttribute('class', 'card-title');
       title.textContent = input;
       card.appendChild(title);
 
       data.forEach(({ kata, arti }) => {
-        const lema = document.createElement("h4");
-        lema.setAttribute("class", "card-lema");
+        const lema = document.createElement('h4');
+        lema.setAttribute('class', 'card-lema');
 
-        const char = kata.trim().split("");
+        const char = kata.trim().split('');
         const lastChar = char.at(-1);
         const lastCharNum = parseInt(lastChar, 10);
         const isLastCharNaN = isNaN(lastCharNum);
-        const isLastCharNumber = typeof lastCharNum === "number";
+        const isLastCharNumber = typeof lastCharNum === 'number';
 
         if (!isLastCharNaN && isLastCharNumber) {
-          const sup = document.createElement("sup");
+          const sup = document.createElement('sup');
           sup.textContent = char.pop();
-          lema.textContent = char.join("");
+          lema.textContent = char.join('');
           lema.appendChild(sup);
         } else {
           lema.textContent = kata;
@@ -154,22 +164,23 @@ const WORD_API_URL = "https://kbbi-api-amm.herokuapp.com/search?q=";
 
         arti.forEach((meaning) => {
           // const mean = meaning.split(" ");
-          const content = document.createElement("p");
-          content.setAttribute("class", "card-content");
+          const content = document.createElement('p');
+          content.setAttribute('class', 'card-content');
           content.textContent = meaning;
           card.appendChild(content);
         });
 
-        main.innerHTML = "";
+        main.innerHTML = '';
         main.append(card);
       });
     } catch (error) {
+      main.innerHTML = '<p style="color: red">Kata not found!</p>';
       console.error(error);
     }
   });
 
   // Close autocomplete result list if click outside of it
-  document.addEventListener("click", function (e) {
+  document.addEventListener('click', function (e) {
     closeAutocomplete();
   });
 })();
@@ -181,28 +192,28 @@ async function getKata(word) {
 }
 
 function showResetButton() {
-  const resetButton = document.querySelector(".reset-button");
-  resetButton.style.display = "block";
+  const resetButton = document.querySelector('.reset-button');
+  resetButton.style.display = 'block';
 }
 
 function hideResetButton() {
-  const resetButton = document.querySelector(".reset-button");
-  resetButton.style.display = "none";
+  const resetButton = document.querySelector('.reset-button');
+  resetButton.style.display = 'none';
 }
 
 function showAutocomplete() {
-  const result = document.querySelector(".result");
-  result.style.display = "block";
+  const result = document.querySelector('.result');
+  result.style.display = 'block';
 }
 
 function hideAutocomplete() {
-  const result = document.querySelector(".result");
-  result.style.display = "none";
+  const result = document.querySelector('.result');
+  result.style.display = 'none';
 }
 
 function deleteAutocomplete() {
-  const resultList = document.querySelector(".result-list");
-  resultList.innerHTML = "";
+  const resultList = document.querySelector('.result-list');
+  resultList.innerHTML = '';
 }
 
 function closeAutocomplete() {
@@ -214,12 +225,12 @@ function addActiveElement(element, currentFocus) {
   if (!element || element.length <= 0) return false;
   if (currentFocus < 0) currentFocus = element.length - 1;
 
-  element[currentFocus].classList.add("result-item-active");
+  element[currentFocus].classList.add('result-item-active');
   element[currentFocus].focus();
 }
 
 function removeAllActiveElement(element) {
   for (var i = 0; i < element.length; i++) {
-    element[i].classList.remove("result-item-active");
+    element[i].classList.remove('result-item-active');
   }
 }
