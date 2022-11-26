@@ -1,0 +1,202 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --typeface: 'Inter', 'Roboto', sans-serif;
+  --text-color-primary: hsla(225, 15%, 17%, 1);
+  --bg-color-primary: hsla(225, 15%, 17%, 1);
+  --border-color: hsl(220deg 9% 87%);
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(100%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/**
+ * CSS Reset
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+#app,
+#__next {
+  isolation: isolate;
+}
+
+/* 
+  Font scale configuration
+  See: https://type-scale.com/
+*/
+
+p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 3rem 0 1.38rem;
+  font-family: var(--typeface);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: clamp(2.074rem, 1.1vw + 1.8rem, 2.488rem);
+}
+
+h2 {
+  font-size: clamp(1.728rem, 0.9vw + 1.5rem, 2.074rem);
+}
+
+h3 {
+  font-size: clamp(1.44rem, 0.8vw + 1.2rem, 1.728rem);
+}
+
+h4 {
+  font-size: clamp(1.2rem, 0.6vw + 1rem, 1.44rem);
+}
+
+h5 {
+  font-size: clamp(1.1rem, 0.3vw + 1rem, 1.2rem);
+}
+
+small,
+.text_small {
+  font-size: 0.833rem;
+}
+
+/*
+  Outline focus by Adam Argyle (@argyleink)
+*/
+
+@media (prefers-reduced-motion: no-preference) {
+  :focus {
+    transition: outline-offset 0.25s ease;
+    outline-offset: 3px;
+    outline-color: hsla(225, 15%, 17%, 1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
