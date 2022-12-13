@@ -5,9 +5,11 @@ import svgr from 'vite-plugin-svgr'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  worker: {
+    format: 'es',
+  },
   resolve: {
     alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }, {find: 'react', replacement: 'preact/compat'}, {find: 'react-dom', replacement: 'preact/compat'}],
-
   },
   plugins: [preact(), svgr({exportAsDefault: true, svgrOptions: {
     // Types are out of sync with package & docs
