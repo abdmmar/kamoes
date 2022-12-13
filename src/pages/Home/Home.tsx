@@ -1,6 +1,5 @@
 import { useRef } from 'preact/hooks'
 import { batch, signal, useComputed, useSignal, useSignalEffect } from '@preact/signals'
-import { SuggestionItem } from '@/lib/symspell'
 
 import SearchIcon from '@/assets/icons/search.svg'
 import CloseIcon from '@/assets/icons/x.svg'
@@ -21,15 +20,13 @@ const worker = signal(
 export default function Home() {
   const searchInput = useRef<HTMLInputElement | null>(null)
   const search = useSignal('')
-  const status = useSignal('')
-  const words = useSignal<SuggestionItem[]>([])
-  const topWords = useComputed(() => words.value.slice(0, 5))
+  const status = useSignal<string | undefined>('')
+  const words = useSignal<string[]>([])
+  const topWords = useComputed(() => words.value?.slice(0, 5) || [])
 
   useSignalEffect(() => {
     worker.value.onmessage = (e: MessageEvent<WorkerMessage>) => {
-      if (e.data.message) {
-        status.value = e.data.message
-      }
+      status.value = e.data.message
       if (e.data.type === 'data') {
         words.value = e.data.data
       }
@@ -86,14 +83,14 @@ export default function Home() {
               <SearchIcon />
             </button>
           </form>
-          {topWords.value.length > 0 ? (
+          {topWords.value.length > 0 && search.value ? (
             <div class={cx.result}>
               <ul class={cx.resultList}>
                 {topWords.value.map((word) => (
                   <Item
-                    key={word.term}
+                    key={word}
                     value={search.value}
-                    word={word.term}
+                    word={word}
                     onClick={onClickSuggestionItem}
                   />
                 ))}
@@ -115,18 +112,11 @@ interface ItemProps {
 
 function Item({ value, word, onClick }: ItemProps) {
   const splitWord = word.replace(value, '')
-  const isHighlight = splitWord.length !== word.length
 
   return (
     <li class={cx.resultItem} onClick={() => onClick(word)}>
-      {isHighlight ? (
-        <>
-          <strong>{value}</strong>
-          {splitWord}
-        </>
-      ) : (
-        <>{word}</>
-      )}
+      <strong>{value}</strong>
+      {splitWord}
     </li>
   )
 }

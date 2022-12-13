@@ -1,6 +1,7 @@
-import SymSpell from '@/lib/symspell';
+import Trie from '@/lib/trie';
+import localforage from 'localforage';
 
-const symSpell = new SymSpell()
+const trie = new Trie();
 
 interface WorkerMessage {
   type: 'info' | 'data' | 'error',
@@ -10,25 +11,40 @@ interface WorkerMessage {
 
 const createMessage = (options: WorkerMessage) => ({...options})
 
-postMessage(createMessage({type: 'info', message:'🚀 Fetching words...'}));
-
-fetch('https://cdn.statically.io/gh/abdmmar/playground/main/src/kbbi-autocomplete/kbbi.json')
-  .then((response) => response.json())
-  .then((words: string[]) => {
-    postMessage(createMessage({type: 'info', message:'📖 Adding words to dictionary...'}));
-    for (const word of words) {
-      symSpell.add(word)
+const initDB = async (): Promise<[Array<string> | null, Error | null]> => {
+  try {
+    const kbbi: string | null = await localforage.getItem('kbbi')
+    
+    if(!kbbi) {
+      const words_ = await import('../../data/words.json');
+      await localforage.setItem('kbbi', JSON.stringify(words_.default));
+      return [words_.default, null]
     }
-  })
-  .finally(() => {
-    postMessage(createMessage({type: 'info', message:'✅ Initialization complete'}));
-    setTimeout(() => postMessage(''), 500);
-  })
-  .catch((e) => {
-    postMessage(e);
-  });
+
+    return [JSON.parse(kbbi), null]
+  } catch (err) {
+    return [null, err as Error]
+  }
+}
+
+const main = async () => {
+  const [words, error] = await initDB()
+  
+  if(error || !words) {
+    return postMessage(createMessage({type: 'error', message: error?.message || '❌ Tidak ada entri'}));
+  }
+  
+  for (const word of words) {
+    trie.insert(word.toLowerCase());
+  }
+}
+
+main().then(() => {
+  postMessage(createMessage({type: 'info', message:'✅ Inisialisasi selesai'}));
+  setTimeout(() => postMessage(createMessage({type: 'info', message:''})), 500);
+})
 
 onmessage = (event) => {
-  const result = symSpell.search(event.data);
+  const result = trie.autocomplete(event.data)
   postMessage(createMessage({type: 'data', data: result}));
 };
