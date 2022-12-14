@@ -1,8 +1,9 @@
 import Trie from '@/lib/trie';
 import localforage from 'localforage';
-import { WorkerMessage, createMessage } from '@/lib/worker';
+import { WorkerMessage, createMessage, Manager } from '@/lib/worker';
 
 const trie = new Trie();
+const worker = new Manager(self)
 
 const initDB = async (): Promise<[Array<string> | null, Error | null]> => {
   try {
@@ -19,6 +20,27 @@ const initDB = async (): Promise<[Array<string> | null, Error | null]> => {
     return [null, err as Error]
   }
 }
+
+(async function main() {
+  const [words, error] = await initDB()
+  
+  if(error || !words) {
+    return worker.post<WorkerMessage>('words', createMessage({type: 'error', message: error?.message || '❌ Tidak ada entri'}))
+  }
+  
+  for (const word of words) {
+    trie.insert(word.toLowerCase());
+  }
+
+  worker.post<WorkerMessage>('words', createMessage({type: 'info', message:'✅ Inisialisasi selesai'}))
+  setTimeout(() => worker.post<WorkerMessage>('words',createMessage({type: 'info', message:''})), 500);
+})()
+
+worker.get<WorkerMessage<string>>('words', (e, {data}) => {
+  const result = trie.autocomplete(data || '')
+  worker.post<WorkerMessage>('words', createMessage({type: 'data', data: result}))
+})
+
 
 const suffixWordsCache = new Map()
 let suffixList: Array<string> = []
@@ -50,24 +72,6 @@ const getSuffixWords = async (suffix: string) => {
   return suffixWords
 }
 
-const main = async () => {
-  const [words, error] = await initDB()
-  
-  if(error || !words) {
-    return postMessage(createMessage({type: 'error', message: error?.message || '❌ Tidak ada entri'}));
-  }
-  
-  for (const word of words) {
-    trie.insert(word.toLowerCase());
-  }
-}
-
-main().then(() => {
-  postMessage(createMessage({type: 'info', message:'✅ Inisialisasi selesai'}));
-  setTimeout(() => postMessage(createMessage({type: 'info', message:''})), 500);
+worker.get('suffix', (e, data) => {
+  worker.post<WorkerMessage>('suffix', createMessage({type: 'data', data: data.data.toUpperCase()}))
 })
-
-onmessage = (e: MessageEvent<WorkerMessage>) => {
-  const result = trie.autocomplete(e.data.data)
-  postMessage(createMessage({type: 'data', data: result}));
-};

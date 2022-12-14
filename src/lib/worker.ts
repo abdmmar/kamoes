@@ -6,46 +6,45 @@ export interface WorkerMessage<T = any> {
 
 export const createMessage = <TData = any>(options: WorkerMessage<TData>) => ({...options})
 
-type PostMessage = {
-  type: string,
-  message: any,
+type PostMessage<T = any> = {
+  path: string,
+  message: T,
 }
 
 export class Manager {
-  worker: Worker
-  path: Array<string> = []
+  worker: Worker | Window & typeof globalThis
+  path: Map<string, any> = new Map()
 
-  constructor(worker: Worker){
+  constructor(worker: Worker | Window & typeof globalThis){
     this.worker = worker
   }
 
-  createMessage(path: string, message: any): PostMessage {
-    return {type: path, message}
+  createMessage<TMessage = any>(path: string, message: TMessage): PostMessage<TMessage> {
+    return {path, message}
   }
 
-  post(path: string, message: any, options?: StructuredSerializeOptions){
-    const path_ = this.addPath(path)
-    const message_ = this.createMessage(path_, message)
+  post<TMessage = any>(path: string, message: TMessage, options?: StructuredSerializeOptions){
+    const {path: path_} = this.addPath(path)
+    const message_ = this.createMessage<TMessage>(path_, message)
     this.worker.postMessage(message_, options)
   }
 
-  get(path: string, handler: (e: MessageEvent) => void){
-    this.worker.onmessage = (e: MessageEvent<PostMessage>) => {
-      const {type} = e.data
-      const path_ = this.addPath(path)
-      
-      if(path_ === type) {
-        handler(e)
-      }
-    }
+  get<TData = any>(path: string, handler: (e: MessageEvent<TData>, data: TData) => void){
+    this.addPath(path, handler)
+
+    this.worker.onmessage = (e: MessageEvent<PostMessage<TData>>) => {
+      const {path: path__, message} = e.data
+      const handler_ = this.path.get(path__)
+      handler_(e, message)
+    }   
   }
 
-  addPath(path: string){
-    if(!this.path.includes(path)){
-      this.path.push(path)
-      return path
+  addPath(path: string, value?: any){
+    if(!this.path.has(path)){
+      this.path.set(path, value)
+      return {path, handler: this.path.get(path)}
     } else {
-      return path
+      return {path, handler: this.path.get(path)}
     }
   }
 }

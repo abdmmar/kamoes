@@ -1,12 +1,12 @@
 import { useRef } from 'preact/hooks'
-import { batch, signal, useComputed, useSignal, useSignalEffect } from '@preact/signals'
+import { batch, useComputed, useSignal, useSignalEffect } from '@preact/signals'
 
-import { WorkerMessage, createMessage } from '@/lib/worker'
+import { createMessage, Manager, WorkerMessage } from '@/lib/worker'
 import SearchIcon from '@/assets/icons/search.svg'
 import CloseIcon from '@/assets/icons/x.svg'
 import cx from './Home.module.css'
 
-const worker = signal(
+const worker = new Manager(
   new Worker(new URL('./worker.ts', import.meta.url), {
     type: 'module',
   }),
@@ -20,18 +20,25 @@ export default function Home() {
   const topWords = useComputed(() => words.value?.slice(0, 5) || [])
 
   useSignalEffect(() => {
-    worker.value.onmessage = (e: MessageEvent<WorkerMessage>) => {
-      status.value = e.data.message
-      if (e.data.type === 'data') {
-        words.value = e.data.data
+    worker.get<WorkerMessage<string[]>>('words', (e, { type, message, data }) => {
+      status.value = message
+      if (type === 'data') {
+        words.value = data || []
       }
-    }
+    })
+
+    worker.get('suffix', (e, data) => {
+      console.log(data)
+    })
   })
 
   const onChangeSearch = (e: Event) => {
     const { value } = e.target as HTMLInputElement
     search.value = value.toLowerCase()
-    worker.value.postMessage(createMessage({ type: 'data', data: value.toLowerCase() }))
+    worker.post<WorkerMessage<string>>(
+      'words',
+      createMessage({ type: 'data', data: value.toLowerCase() }),
+    )
   }
 
   const onClickSuggestionItem = (word: string) => {
