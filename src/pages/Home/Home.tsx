@@ -63,6 +63,7 @@ export default function Home() {
                 Search
               </label>
               <input
+                autofocus
                 type="text"
                 id="searchInput"
                 name="searchInput"
