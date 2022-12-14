@@ -1,15 +1,10 @@
 import { useRef } from 'preact/hooks'
 import { batch, signal, useComputed, useSignal, useSignalEffect } from '@preact/signals'
 
+import { WorkerMessage, createMessage } from '@/lib/worker'
 import SearchIcon from '@/assets/icons/search.svg'
 import CloseIcon from '@/assets/icons/x.svg'
 import cx from './Home.module.css'
-
-interface WorkerMessage {
-  type: 'info' | 'data' | 'error'
-  message?: string
-  data?: any
-}
 
 const worker = signal(
   new Worker(new URL('./worker.ts', import.meta.url), {
@@ -35,8 +30,8 @@ export default function Home() {
 
   const onChangeSearch = (e: Event) => {
     const { value } = e.target as HTMLInputElement
-    search.value = value
-    worker.value.postMessage(value)
+    search.value = value.toLowerCase()
+    worker.value.postMessage(createMessage({ type: 'data', data: value.toLowerCase() }))
   }
 
   const onClickSuggestionItem = (word: string) => {

@@ -1,15 +1,8 @@
 import Trie from '@/lib/trie';
 import localforage from 'localforage';
+import { WorkerMessage, createMessage } from '@/lib/worker';
 
 const trie = new Trie();
-
-interface WorkerMessage {
-  type: 'info' | 'data' | 'error',
-  message?: string,
-  data?: any,
-}
-
-const createMessage = (options: WorkerMessage) => ({...options})
 
 const initDB = async (): Promise<[Array<string> | null, Error | null]> => {
   try {
@@ -25,6 +18,36 @@ const initDB = async (): Promise<[Array<string> | null, Error | null]> => {
   } catch (err) {
     return [null, err as Error]
   }
+}
+
+const suffixWordsCache = new Map()
+let suffixList: Array<string> = []
+
+const getSuffixWords = async (suffix: string) => {
+  const cacheSuffix = suffixWordsCache.get(suffix)
+  
+  if(cacheSuffix) return cacheSuffix
+
+  if(!suffixList) suffixList = await import('../../data/suffix.json')
+  
+  if(!suffixList.includes(suffix)) return
+
+  const kbbi: string | null = await localforage.getItem('kbbi')
+
+  if(!kbbi) return
+  
+  const words = JSON.parse(kbbi)
+  const suffixWords = []
+
+  for (const word of words) {
+    if (word.endsWith(suffix)) {
+      suffixWords.push(word)
+    }
+  }
+
+  suffixWordsCache.set(suffix, suffixWords)
+  
+  return suffixWords
 }
 
 const main = async () => {
@@ -44,7 +67,7 @@ main().then(() => {
   setTimeout(() => postMessage(createMessage({type: 'info', message:''})), 500);
 })
 
-onmessage = (event) => {
-  const result = trie.autocomplete(event.data)
+onmessage = (e: MessageEvent<WorkerMessage>) => {
+  const result = trie.autocomplete(e.data.data)
   postMessage(createMessage({type: 'data', data: result}));
 };
