@@ -28,16 +28,26 @@
   transition: border 0.15s, box-shadow 0.15s;
 }
 
-.autocomplete:hover {
+.autocomplete:hover,
+.autocomplete:focus-within {
   background-color: #fff;
   border: 1px solid var(--border-color);
   box-shadow: rgb(0 0 0 / 14%) 0px 2px 10px;
 }
 
-.autocomplete:focus-within {
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  box-shadow: rgb(0 0 0 / 14%) 0px 2px 10px;
+@media (prefers-color-scheme: dark) {
+  .autocomplete {
+    color: #ffffff;
+    background-color: var(--text-color-primary);
+  }
+
+  .autocomplete:hover,
+  .autocomplete:focus-within {
+    --border-color: hsla(225, 15%, 27%, 1);
+    background-color: var(--text-color-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: rgb(0 0 0 / 14%) 0px 2px 10px;
+  }
 }
 
 .searchField {
@@ -70,6 +80,15 @@
   background-color: white;
   border-radius: 5px;
   transition: all 0.15s;
+}
+
+@media (prefers-color-scheme: dark) {
+  .resetButton,
+  .searchSubmit,
+  .searchInput {
+    color: #ffffff;
+    background-color: var(--text-color-primary);
+  }
 }
 
 .resetButton {
@@ -111,6 +130,13 @@
   top: 100%;
   left: 0;
   right: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .result {
+    color: #ffffff;
+    background-color: var(--text-color-primary);
+  }
 }
 
 .resultList {
