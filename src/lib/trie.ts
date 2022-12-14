@@ -1,25 +1,29 @@
 class TrieNode {
+  children: Map<string, TrieNode | null>;
+
   constructor() {
     this.children = new Map();
   }
 }
 
 class Trie {
+  root: TrieNode;
+  
   constructor() {
     this.root = new TrieNode();
   }
   // O(K+1)
-  insert(word) {
+  insert(word: string) {
     let currentNode = this.root;
-    let chars = word.split('');
+    const chars = word.split('');
 
-    for (let char of chars) {
-      let childNode = currentNode.children.get(char);
+    for (const char of chars) {
+      const childNode = currentNode.children.get(char);
 
       if (childNode) {
         currentNode = childNode;
       } else {
-        let newNode = new TrieNode();
+        const newNode = new TrieNode();
         currentNode.children.set(char, newNode);
         currentNode = newNode;
       }
@@ -28,12 +32,12 @@ class Trie {
     currentNode.children.set('*', null);
   }
   // O(K)
-  search(word) {
+  search(word: string) {
     let currentNode = this.root;
-    let chars = word.split('');
+    const chars = word.split('');
 
-    for (let char of chars) {
-      let childNode = currentNode.children.get(char);
+    for (const char of chars) {
+      const childNode = currentNode.children.get(char);
 
       if (childNode) {
         currentNode = childNode;
@@ -44,10 +48,10 @@ class Trie {
 
     return currentNode;
   }
-  collectAllWords(node, word = '', words = []) {
-    let currentNode = node || this.root;
+  collectAllWords(node: TrieNode | null, word = '', words: string[] = []) {
+    const currentNode = node || this.root;
 
-    currentNode.children.forEach((value, key) => {
+    currentNode.children.forEach((value: TrieNode | null, key: string) => {
       // value is node
       if (key === '*') {
         words.push(word);
@@ -58,8 +62,8 @@ class Trie {
 
     return words;
   }
-  autocomplete(prefix) {
-    let currentNode = this.search(prefix);
+  autocomplete(prefix: string) {
+    const currentNode = this.search(prefix);
 
     if (!currentNode) {
       return null;
