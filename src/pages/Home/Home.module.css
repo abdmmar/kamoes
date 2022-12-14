@@ -159,6 +159,14 @@
   color: #ffffff;
 }
 
+@media (prefers-color-scheme: dark) {
+  .resultItem:hover,
+  .resultItem-active {
+    color: var(--text-color-primary) !important;
+    background-color: #ffffff !important;
+  }
+}
+
 .resultItem:first-child {
   margin-top: 0;
 }
